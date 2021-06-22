@@ -14,16 +14,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument("job_num", help="The number of the job that's running", type=int)
 args = parser.parse_args()
 
-Nsamples = 8000
+Nsamples = 20000
 minLeaves = 1
-maxLeaves = 60
-maxNTry = 20000
+maxLeaves = 150
+maxNTry = 50000
 
 n_cuts = 40
 n_lambda = 40
 
-cut_vals = np.linspace(4, 90, n_cuts)
-lambda_vals = np.linspace(1e-1, 5, n_lambda)
+#cut_vals = np.linspace(4, 90, n_cuts)
+#lambda_vals = np.linspace(1e-1, 5, n_lambda)
+cut_vals = np.linspace(26, 43, n_cuts)
+lambda_vals = np.linspace(1.35, 2.4, n_lambda)
 
 grid_cut, grid_lambda = np.meshgrid(cut_vals, lambda_vals)
 
@@ -60,8 +62,21 @@ simulator = invMass_ginkgo.Simulator(jet_p=jet4vec,
 
 jet_list = simulator(rate)
 
-simulator.save(jet_list, "/scratch/mdd424/data/ginkgo", "ginkgo_8000_jets_jetp_400_lambda_{:n}_ptcut_{:n}_{}_{}".format(
+num_leaves = [len(x["leaves"]) for x in jet_list]
+leaf_dist = np.histogram(num_leaves, bins=np.arange(1,120), density=True)[0]
+
+hist_savename = "ginkgo_hist_20000_jets_jetp_400_lambda_{:n}_ptcut_{:n}_{}_{}".format(
     int(grid_lambda[j,i])*1000,
     int(grid_cut[j,i]),
     j,
-    i))
+    i)
+
+savename = "ginkgo_20000_jets_jetp_400_lambda_{:n}_ptcut_{:n}_{}_{}".format(
+    int(grid_lambda[j,i])*1000,
+    int(grid_cut[j,i]),
+    j,
+    i)
+
+np.save(os.path.join("/scratch/mdd424/data/ginkgo", hist_savename), leaf_dist)
+
+simulator.save(jet_list, "/scratch/mdd424/data/ginkgo", savename)

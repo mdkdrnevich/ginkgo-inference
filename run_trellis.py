@@ -40,7 +40,7 @@ class ModelNode(TrellisNode):
 
         logger.debug(f"computing energy of split: {a_node, b_node}")
 
-        split_llh = likelihood.split_logLH(a_node.map_features[0],
+        split_llh = likelihood.split_logLH_with_stop_nonstop_prob(a_node.map_features[0],
                                            a_node.map_features[1],
                                            b_node.map_features[0],
                                            b_node.map_features[1],
@@ -163,14 +163,16 @@ if __name__ == "__main__":
     gt_trees = load_jets("ginkgo_5000_jets_no_cuts_lambda_21_pt_min_36_jetp_400")
     
     NleavesMin =1
-    NleavesMax=30
-    MaxNjets = 1000
+    NleavesMax=100
+    MaxNjets = 5000
 
     n_cuts = 40
     n_lambda = 40
 
-    cut_vals = np.linspace(4, 90, n_cuts)
-    lambda_vals = np.linspace(1e-1, 5, n_lambda)
+    #cut_vals = np.linspace(4, 90, n_cuts)
+    #lambda_vals = np.linspace(1e-1, 5, n_lambda)
+    cut_vals = np.linspace(26, 43, n_cuts)
+    lambda_vals = np.linspace(1.35, 2.4, n_lambda)
     grid_cut, grid_lambda = np.meshgrid(cut_vals, lambda_vals)
     
     j, i = divmod(args.job_num, 40)
