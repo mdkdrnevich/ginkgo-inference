@@ -40,10 +40,8 @@ class ModelNode(TrellisNode):
 
         logger.debug(f"computing energy of split: {a_node, b_node}")
 
-        split_llh = likelihood.split_logLH_with_stop_nonstop_prob(a_node.map_features[0],
-                                           a_node.map_features[1],
-                                           b_node.map_features[0],
-                                           b_node.map_features[1],
+        split_llh = likelihood.split_logLH_with_stop_nonstop_prob(a_node.map_features,
+                                           b_node.map_features,
                                            self.model_params["delta_min"],
                                            self.model_params["lam"])
         logger.debug(f"split_llh = {split_llh}")
@@ -56,18 +54,18 @@ class ModelNode(TrellisNode):
         Args: sibling nodes
         returns: list where each entry is a parent feature, e.g. [feature1,feature2,...]
         """
-        momentum = a_node.map_features[0] + b_node.map_features[0]
+        momentum = a_node.map_features + b_node.map_features
         logger.debug(f"computing momentum for {a_node, b_node, momentum}")
 
         
-        logger.debug(f"computing  parent invariant mass {a_node, a_node.map_features[0], b_node, b_node.map_features[0]}")
-        pP = a_node.map_features[0] + b_node.map_features[0]
+#         logger.debug(f"computing  parent invariant mass {a_node, a_node.map_features, b_node, b_node.map_features}")
+#         pP = a_node.map_features + b_node.map_features
 
-        """Parent invariant mass squared"""
-        tp1 = pP[0] ** 2 - np.linalg.norm(pP[1::]) ** 2
-        logger.debug(f"tp =  {tp1}")
+#         """Parent invariant mass squared"""
+#         tp1 = pP[0] ** 2 - np.linalg.norm(pP[1::]) ** 2
+#         logger.debug(f"tp =  {tp1}")
 
-        return [momentum,tp1]
+        return momentum
     
     
 def runTrellisOnly(gt_trees,
@@ -121,7 +119,7 @@ def runTrellisOnly(gt_trees,
             N=len(data_params['leaves'])
             
             """Replace with current model parameters"""
-            leaves_features =[ [data_params['leaves'][i],0] for i in range(N)]
+            leaves_features =[ data_params['leaves'][i] for i in range(N)]
             #model_params ={}
             #model_params["delta_min"] = float(data_params['pt_cut'])
             #model_params["lam"]= float(data_params['Lambda'])
