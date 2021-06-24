@@ -163,7 +163,7 @@ if __name__ == "__main__":
     
     NleavesMin =1
     NleavesMax=100
-    MaxNjets = 5000
+    MaxNjets = 1000
 
     n_cuts = 40
     n_lambda = 40
