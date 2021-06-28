@@ -19,33 +19,20 @@ minLeaves = 1
 maxLeaves = 150
 maxNTry = 50000
 
-n_cuts = 40
-n_lambda = 40
+n_lambda = 150
 
-#cut_min = 4
-#cut_max = 90
-#lambda_min = 1e-1
-#lambda_max = 5
+lambda_min = 1.6
+lambda_max = 2.75
 
-#cut_min = 26
-#cut_max = 43
-cut_min = 33
-cut_max = 38
-lambda_min = 1.35
-lambda_max = 2.4
-
-cut_vals = np.linspace(cut_min, cut_max, n_cuts)
 lambda_vals = np.linspace(lambda_min, lambda_max, n_lambda)
 
-grid_cut, grid_lambda = np.meshgrid(cut_vals, lambda_vals)
-
-j, i = divmod(args.job_num, 40)
+i = args.job_num
 
 rate2=torch.tensor(8.)
-pt_min = torch.tensor(float(grid_cut[j,i]))
+pt_min = torch.tensor(float(36.0))
 
 ### Physics inspired parameters to get ~ between 20 and 50 constituents
-QCD_rate = float(grid_lambda[j,i])
+QCD_rate = float(lambda_vals[i])
 
 QCD_mass = 30.
 
@@ -75,16 +62,14 @@ jet_list = simulator(rate)
 num_leaves = [len(x["leaves"]) for x in jet_list]
 leaf_dist = np.histogram(num_leaves, bins=np.arange(1,120), density=True)[0]
 
-hist_savename = "ginkgo_hist_20000_jets_jetp_400_lambda_{:n}_ptcut_{:n}_{}_{}".format(
-    int(grid_lambda[j,i])*1000,
-    int(grid_cut[j,i]),
-    j,
+hist_savename = "ginkgo_hist_20000_jets_1D_jetp_400_lambda_{:n}_ptcut_{:n}_{}".format(
+    int(lambda_vals[i])*1000,
+    int(36.0),
     i)
 
-savename = "ginkgo_20000_jets_jetp_400_lambda_{:n}_ptcut_{:n}_{}_{}".format(
-    int(grid_lambda[j,i])*1000,
-    int(grid_cut[j,i]),
-    j,
+savename = "ginkgo_20000_jets_1D_jetp_400_lambda_{:n}_ptcut_{:n}_{}".format(
+    int(lambda_vals[i])*1000,
+    int(36.0),
     i)
 
 np.save(os.path.join("/scratch/mdd424/data/ginkgo", hist_savename), leaf_dist)
