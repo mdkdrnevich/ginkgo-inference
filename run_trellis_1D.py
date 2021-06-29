@@ -160,35 +160,38 @@ if __name__ == "__main__":
     parser.add_argument("job_num", help="The number of the job that's running", type=int)
     args = parser.parse_args()
     
-    gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_21_pt_min_36_jetp_400_with_perm")
+    #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_21_pt_min_36_jetp_400_with_perm")
+    gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
     
     NleavesMin =1
     NleavesMax=100
     MaxNjets = 10000
 
     n_lambda = 150
-    #lambda_min = 1.35
-    #lambda_max = 2.4
-    lambda_min = 1.6
-    lambda_max = 2.75
+    #lambda_min = 1.6
+    #lambda_max = 2.75
+    lambda_min = 1.9
+    lambda_max = 3.05
+    
+    pt_cut = 30.0
 
     lambda_vals = np.linspace(lambda_min, lambda_max, n_lambda)
     
-    model_params = {"delta_min": 36.0, "lam": lambda_vals[args.job_num]}
+    model_params = {"delta_min": pt_cut, "lam": lambda_vals[args.job_num]}
 
     results, _ =  runTrellisOnly(gt_trees, 
                                  model_params,
                                  NleavesMin =NleavesMin, 
                                  NleavesMax= NleavesMax, 
                                  MaxNjets = MaxNjets)
-    results["delta_min"] = 36.0
+    results["delta_min"] = pt_cut
     results["lam"] = lambda_vals[args.job_num]
     results["coords"] = args.job_num
     
     outdir = "/scratch/mdd424/data/trellis"
     out_filename = os.path.join(outdir, "trellis_10000_jets_1D_lambda_{:n}_ptcut_{:n}_{}_with_perm.pkl".format(
         int(lambda_vals[args.job_num])*1000,
-        int(36.0),
+        int(pt_cut),
         args.job_num))
     with open(out_filename, "wb") as f:
         pickle.dump(results, f, protocol=2)

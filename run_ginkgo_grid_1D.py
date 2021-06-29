@@ -19,17 +19,22 @@ minLeaves = 1
 maxLeaves = 150
 maxNTry = 50000
 
+
 n_lambda = 150
 
-lambda_min = 1.6
-lambda_max = 2.75
+#lambda_min = 1.6
+#lambda_max = 2.75
+lambda_min = 1.9
+lambda_max = 3.05
+
+pt_cut = 30.0
 
 lambda_vals = np.linspace(lambda_min, lambda_max, n_lambda)
 
 i = args.job_num
 
 rate2=torch.tensor(8.)
-pt_min = torch.tensor(float(36.0))
+pt_min = torch.tensor(float(pt_cut))
 
 ### Physics inspired parameters to get ~ between 20 and 50 constituents
 QCD_rate = float(lambda_vals[i])
@@ -64,12 +69,12 @@ leaf_dist = np.histogram(num_leaves, bins=np.arange(1,120), density=True)[0]
 
 hist_savename = "ginkgo_hist_20000_jets_1D_jetp_400_lambda_{:n}_ptcut_{:n}_{}".format(
     int(lambda_vals[i])*1000,
-    int(36.0),
+    int(pt_cut),
     i)
 
 savename = "ginkgo_20000_jets_1D_jetp_400_lambda_{:n}_ptcut_{:n}_{}".format(
     int(lambda_vals[i])*1000,
-    int(36.0),
+    int(pt_cut),
     i)
 
 np.save(os.path.join("/scratch/mdd424/data/ginkgo", hist_savename), leaf_dist)
