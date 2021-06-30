@@ -161,11 +161,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_21_pt_min_36_jetp_400_with_perm")
-    gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
+    gt_trees = load_jets("ginkgo_100000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
     
     NleavesMin =1
     NleavesMax=100
-    MaxNjets = 10000
+    MaxNjets = 100000
 
     n_lambda = 150
     #lambda_min = 1.6
@@ -189,7 +189,8 @@ if __name__ == "__main__":
     results["coords"] = args.job_num
     
     outdir = "/scratch/mdd424/data/trellis"
-    out_filename = os.path.join(outdir, "trellis_10000_jets_1D_lambda_{:n}_ptcut_{:n}_{}_with_perm.pkl".format(
+    out_filename = os.path.join(outdir, "trellis_{}_jets_1D_lambda_{:n}_ptcut_{:n}_{}_with_perm.pkl".format(
+        MaxNjets,
         int(lambda_vals[args.job_num])*1000,
         int(pt_cut),
         args.job_num))

@@ -65,7 +65,7 @@ simulator = invMass_ginkgo.Simulator(jet_p=jet4vec,
 jet_list = simulator(rate)
 
 num_leaves = [len(x["leaves"]) for x in jet_list]
-leaf_dist = np.histogram(num_leaves, bins=np.arange(1,120), density=True)[0]
+leaf_dist = np.histogram(num_leaves, bins=np.arange(1,120)-0.5, density=True)[0]
 
 hist_savename = "ginkgo_hist_20000_jets_1D_jetp_400_lambda_{:n}_ptcut_{:n}_{}".format(
     int(lambda_vals[i])*1000,
