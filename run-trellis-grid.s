@@ -4,8 +4,11 @@
 #SBATCH --cpus-per-task=1
 
 #SBATCH --mem=8GB
-#SBATCH --time=2:00:00
+#SBATCH --time=1:30:00
 #SBATCH --job-name=Trellis_Grid_%j
+
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=mdd424@nyu.edu
 
 #SBATCH --output=slurm_trellis_%a.out
 

@@ -161,11 +161,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_21_pt_min_36_jetp_400_with_perm")
+    #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm_exp")
     gt_trees = load_jets("ginkgo_100000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
     
     NleavesMin =1
     NleavesMax=100
-    MaxNjets = 100000
+    MaxNjets = 1000
 
     n_lambda = 150
     #lambda_min = 1.6

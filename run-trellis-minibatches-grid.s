@@ -4,10 +4,13 @@
 #SBATCH --cpus-per-task=1
 
 #SBATCH --mem=8GB
-#SBATCH --time=2:00:00
-#SBATCH --job-name=Trellis_Grid_%j
+#SBATCH --time=8:00:00
+#SBATCH --job-name=Trellis_Minibatch_Grid_%j
 
-#SBATCH --output=slurm_trellis_%a.out
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=mdd424@nyu.edu
+
+#SBATCH --output=slurm_trellis_minibatch_%a.out
 
 module purge
 
@@ -18,10 +21,15 @@ cd $RUNDIR
 
 if [[ $(hostname -s) =~ ^g ]]; then nv="--nv"; fi
 
-singularity exec $nv \
-            --overlay $SCRATCH/environments/overlay_pytorch.ext3:ro \
-            /scratch/work/public/singularity/cuda11.0-cudnn8-devel-ubuntu18.04.sif \
-            /bin/bash -c "
-source /ext3/env.sh
-python run_trellis_minibatches.py $(( ${SLURM_ARRAY_TASK_ID} ))
-"
+NUM_BATCHES=25
+
+for (( run=0; run<$(($NUM_BATCHES + 0)); run++ )); do
+
+    singularity exec $nv \
+                --overlay $SCRATCH/environments/overlay_pytorch.ext3:ro \
+                /scratch/work/public/singularity/cuda11.0-cudnn8-devel-ubuntu18.04.sif \
+                /bin/bash -c "
+    source /ext3/env.sh
+    python run_trellis_minibatches.py $run $(( ${SLURM_ARRAY_TASK_ID} ))
+    "
+done

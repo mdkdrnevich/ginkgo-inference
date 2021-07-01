@@ -7,6 +7,9 @@
 #SBATCH --time=2:00:00
 #SBATCH --job-name=Ginkgo_Grid_%j
 
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=mdd424@nyu.edu
+
 #SBATCH --output=slurm_ginkgo_%a.out
 
 module purge
