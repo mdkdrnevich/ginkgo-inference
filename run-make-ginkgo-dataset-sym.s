@@ -26,5 +26,5 @@ singularity exec $nv \
             /scratch/work/public/singularity/cuda11.0-cudnn8-devel-ubuntu18.04.sif \
             /bin/bash -c "
 source /ext3/env.sh
-python make_ginkgo_dataset_sym.py $(( ${SLURM_ARRAY_TASK_ID} ))
+python scripts/make_ginkgo_dataset_sym.py $(( ${SLURM_ARRAY_TASK_ID} ))
 "

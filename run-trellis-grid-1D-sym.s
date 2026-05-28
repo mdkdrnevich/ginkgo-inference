@@ -28,5 +28,5 @@ singularity exec $nv \
             /scratch/work/public/singularity/cuda11.0-cudnn8-devel-ubuntu18.04.sif \
             /bin/bash -c "
 source /ext3/env.sh
-python run_trellis_1D_sym.py $(( ${SLURM_ARRAY_TASK_ID} ))
+python scripts/run_trellis_1D_sym.py $(( ${SLURM_ARRAY_TASK_ID} ))
 "

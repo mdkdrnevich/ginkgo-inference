@@ -30,6 +30,6 @@ for (( run=0; run<$(($NUM_BATCHES + 0)); run++ )); do
                 /scratch/work/public/singularity/cuda11.0-cudnn8-devel-ubuntu18.04.sif \
                 /bin/bash -c "
     source /ext3/env.sh
-    python run_trellis_minibatches.py $run $(( ${SLURM_ARRAY_TASK_ID} ))
+    python scripts/run_trellis_minibatches.py $run $(( ${SLURM_ARRAY_TASK_ID} ))
     "
 done
