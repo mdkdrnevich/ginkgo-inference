@@ -10,16 +10,24 @@ from __future__ import annotations
 import argparse
 import multiprocessing as mp
 import os
+import shlex
 import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable, Sequence, Tuple
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run trellis 1D grid jobs locally in parallel."
+        description="Run 1D grid jobs locally in parallel."
+    )
+    parser.add_argument(
+        "--framework",
+        type=str,
+        default="trellis",
+        choices=["trellis", "ginkgo"],
+        help="Framework to use (trellis or ginkgo).",
     )
     parser.add_argument("--start", type=int, default=0, help="First task id (inclusive).")
     parser.add_argument("--end", type=int, default=149, help="Last task id (inclusive).")
@@ -36,8 +44,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--script",
-        default="../../scripts/run_trellis_1D.py",
-        help="Target script to launch for each task id.",
+        default="",
+        help="Target script to launch for each task id (auto-detected if not provided).",
     )
     parser.add_argument(
         "--working-dir",
@@ -46,8 +54,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--log-dir",
-        default="local_logs/trellis_1d",
-        help="Directory for per-task log files.",
+        default="",
+        help="Directory for per-task log files (auto-detected if not provided).",
+    )
+    parser.add_argument(
+        "--config-file",
+        default="",
+        help=(
+            "Optional config filename with extra CLI arguments. "
+            "Whitespace-separated args are read from this file and appended "
+            "to each launched job command."
+        ),
     )
     parser.add_argument(
         "--timeout",
@@ -65,15 +82,33 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Print planned commands without executing.",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    args.script = args.script or f"../../scripts/run_{args.framework}_grid_1D.py"
+    args.log_dir = args.log_dir or f"logs_{args.framework}"
+    args.config_file = args.config_file or f"{args.framework}_1D.config"
+    return args
 
 
-def run_one_job(args: Tuple[int, str, str, str, str, int]) -> Tuple[int, int, float, str]:
-    task_id, python_exe, script_path, working_dir, log_dir, timeout = args
+def load_config_args(config_file: Path) -> list[str]:
+    if not config_file.is_file():
+        raise FileNotFoundError(f"Config file not found: {config_file}")
+
+    raw_text = config_file.read_text(encoding="utf-8")
+    lines = [line.split("#", 1)[0].strip() for line in raw_text.splitlines()]
+    payload = "\n".join(line for line in lines if line)
+    if not payload:
+        return []
+    return shlex.split(payload)
+
+
+def run_one_job(
+    args: Tuple[int, str, str, str, str, int, tuple[str, ...]]
+) -> Tuple[int, int, float, str]:
+    task_id, python_exe, script_path, working_dir, log_dir, timeout, extra_args = args
     start = time.time()
 
     log_path = Path(log_dir) / f"task_{task_id:03d}.log"
-    cmd = [python_exe, script_path, str(task_id)]
+    cmd = [python_exe, script_path, str(task_id), *extra_args]
 
     with log_path.open("w", encoding="utf-8") as log_file:
         log_file.write(f"[command] {' '.join(cmd)}\n")
@@ -106,9 +141,19 @@ def build_jobs(
     working_dir: str,
     log_dir: str,
     timeout: int,
-) -> list[Tuple[int, str, str, str, str, int]]:
+    extra_args: Sequence[str],
+) -> list[Tuple[int, str, str, str, str, int, tuple[str, ...]]]:
+    frozen_extra_args = tuple(extra_args)
     return [
-        (task_id, python_exe, script_path, working_dir, log_dir, timeout)
+        (
+            task_id,
+            python_exe,
+            script_path,
+            working_dir,
+            log_dir,
+            timeout,
+            frozen_extra_args,
+        )
         for task_id in task_ids
     ]
 
@@ -130,6 +175,13 @@ def main() -> int:
         raise FileNotFoundError(f"Working directory not found: {working_dir}")
     if not script_path.is_file():
         raise FileNotFoundError(f"Script not found: {script_path}")
+
+    extra_args: list[str] = []
+    if args.config_file:
+        config_path = Path(args.config_file)
+        if not config_path.is_absolute():
+            config_path = (working_dir / config_path).resolve()
+        extra_args = load_config_args(config_path)
     
     log_dir = Path(args.log_dir)
     if not log_dir.is_absolute():
@@ -142,10 +194,14 @@ def main() -> int:
     print(f"Script: {script_path}")
     print(f"Working dir: {working_dir}")
     print(f"Logs: {log_dir}")
+    if args.config_file:
+        print(f"Config file: {config_path}")
+        print(f"Extra args: {extra_args}")
 
     if args.dry_run:
         for task_id in task_ids:
-            print(f"{args.python} {script_path} {task_id}")
+            cmd = [args.python, str(script_path), str(task_id), *extra_args]
+            print(" ".join(shlex.quote(part) for part in cmd))
         return 0
 
     jobs = build_jobs(
@@ -155,6 +211,7 @@ def main() -> int:
         working_dir=str(working_dir),
         log_dir=str(log_dir),
         timeout=args.timeout,
+        extra_args=extra_args,
     )
 
     failures = []
