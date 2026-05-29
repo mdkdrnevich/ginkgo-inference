@@ -147,8 +147,8 @@ def runTrellisOnly(gt_trees,
     
 def load_jets(filename):
     """Load truth binary trees"""
-    root_dir = "../data/"
-    filename = os.path.join(root_dir, filename)
+    # root_dir = "../data/"
+    # filename = os.path.join(root_dir, filename)
     with open(filename + ".pkl", "rb") as fd:
         Truth= pickle.load(fd, encoding='latin-1')
     return Truth
@@ -158,23 +158,28 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
     parser.add_argument("job_num", help="The number of the job that's running", type=int)
+    parser.add_argument("dataset", help="Dataset filename", type=str)
+    parser.add_argument("--nleaves-min", help="Minimum number of leaves", default=1, type=int)
+    parser.add_argument("--nleaves-max", help="Maximum number of leaves", default=100, type=int)
+    parser.add_argument("--max-njets", help="Maximum number of jets to process", default=10000, type=int)
+    parser.add_argument("--n-lambda", help="Number of lambda values", default=150, type=int)
+    parser.add_argument("--lambda-min", help="Minimum lambda value", default=1.9, type=float)
+    parser.add_argument("--lambda-max", help="Maximum lambda value", default=3.05, type=float)
+    parser.add_argument("--pt-cut", help="Transverse momentum cut", default=30.0, type=float)
+    parser.add_argument("--outdir", help="Output directory", default="/mnt/g/ginkgo/trellis", type=str)
     args = parser.parse_args()
     
-    #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_21_pt_min_36_jetp_400_with_perm")
-    #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm_exp")
-    gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
+    gt_trees = load_jets(args.dataset)
     
-    NleavesMin =1
-    NleavesMax=100
-    MaxNjets = 10000
+    NleavesMin = args.nleaves_min
+    NleavesMax = args.nleaves_max
+    MaxNjets = args.max_njets
 
-    n_lambda = 150
-    #lambda_min = 1.6
-    #lambda_max = 2.75
-    lambda_min = 1.9
-    lambda_max = 3.05
+    n_lambda = args.n_lambda
+    lambda_min = args.lambda_min
+    lambda_max = args.lambda_max
     
-    pt_cut = 30.0
+    pt_cut = args.pt_cut
 
     lambda_vals = np.linspace(lambda_min, lambda_max, n_lambda)
     
@@ -189,8 +194,7 @@ if __name__ == "__main__":
     results["lam"] = lambda_vals[args.job_num]
     results["coords"] = args.job_num
     
-    outdir = "/mnt/g/ginkgo/trellis"
-    out_filename = os.path.join(outdir, "trellis_{}_jets_1D_lambda_{:n}_ptcut_{:n}_{}_with_perm.pkl".format(
+    out_filename = os.path.join(args.outdir, "trellis_{}_jets_1D_lambda_{:n}_ptcut_{:n}_{}_with_perm.pkl".format(
         MaxNjets,
         int(lambda_vals[args.job_num]*1000),
         int(pt_cut),
