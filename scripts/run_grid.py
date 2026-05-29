@@ -87,6 +87,6 @@ savename = "ginkgo_20000_jets_jetp_400_lambda_{:n}_ptcut_{:n}_{}_{}".format(
     j,
     i)
 
-np.save(os.path.join("/scratch/mdd424/data/ginkgo", hist_savename), leaf_dist)
+np.save(os.path.join("/mnt/g/ginkgo/", hist_savename), leaf_dist)
 
-simulator.save(jet_list, "/scratch/mdd424/data/ginkgo", savename)
+simulator.save(jet_list, "/mnt/g/ginkgo/", savename)

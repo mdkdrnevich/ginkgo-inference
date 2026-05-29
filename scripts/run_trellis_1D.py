@@ -147,7 +147,7 @@ def runTrellisOnly(gt_trees,
     
 def load_jets(filename):
     """Load truth binary trees"""
-    root_dir = "/home/mdd424/research/trellis_inference/data/"
+    root_dir = "../data/"
     filename = os.path.join(root_dir, filename)
     with open(filename + ".pkl", "rb") as fd:
         Truth= pickle.load(fd, encoding='latin-1')
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     
     #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_21_pt_min_36_jetp_400_with_perm")
     #gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm_exp")
-    gt_trees = load_jets("ginkgo_100000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
+    gt_trees = load_jets("ginkgo_10000_jets_no_cuts_lambda_24_pt_min_30_jetp_400_with_perm")
     
     NleavesMin =1
     NleavesMax=100
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     results["lam"] = lambda_vals[args.job_num]
     results["coords"] = args.job_num
     
-    outdir = "/scratch/mdd424/data/trellis"
+    outdir = "/mnt/g/ginkgo/trellis"
     out_filename = os.path.join(outdir, "trellis_{}_jets_1D_lambda_{:n}_ptcut_{:n}_{}_with_perm.pkl".format(
         MaxNjets,
         int(lambda_vals[args.job_num]*1000),
