@@ -36,7 +36,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--script",
-        default="run_trellis_1D.py",
+        default="../../scripts/run_trellis_1D.py",
         help="Target script to launch for each task id.",
     )
     parser.add_argument(
@@ -130,7 +130,7 @@ def main() -> int:
         raise FileNotFoundError(f"Working directory not found: {working_dir}")
     if not script_path.is_file():
         raise FileNotFoundError(f"Script not found: {script_path}")
-
+    
     log_dir = Path(args.log_dir)
     if not log_dir.is_absolute():
         log_dir = (working_dir / log_dir).resolve()
