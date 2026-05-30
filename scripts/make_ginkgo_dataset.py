@@ -50,7 +50,7 @@ def main():
     jet_list = simulator(rate)
     
     if args.output_name is None:
-        output_name = "ginkgo_{}_jets_no_cuts_lambda_{}_pt_min_{}_jetp_{}".format(
+        output_name = "ginkgo_{}_jets_no_cuts_lambda_{}_pt_min_{}_jetp_{}_with_perm".format(
             Nsamples, int(QCD_rate * 10), int(pt_min), int(jetP))
     else:
         output_name = args.output_name
