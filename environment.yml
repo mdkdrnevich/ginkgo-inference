@@ -1,0 +1,11 @@
+name: ginkgo
+channels:
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - numpy
+  - scipy
+  - matplotlib
+  - ipykernel
+  - tqdm
+prefix: /home/mdrnevich/miniconda3/envs/ginkgo
